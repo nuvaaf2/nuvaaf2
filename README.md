@@ -128,23 +128,20 @@ STACK    : n8n · GPT-4.1-mini · Telegram · Gmail · Webhook · PDF Parser
 
 ---
 
-## 📊 GitHub Metrics
+## 📊 GitHub Stats
 
 <div align="center">
 
-<img height="180em" src="https://github-readme-stats.vercel.app/api?username=nuvaaf2&show_icons=true&theme=tokyonight&include_all_commits=true&count_private=true&hide_border=true&bg_color=020818&title_color=38bdf8&icon_color=38bdf8&text_color=64748b&border_color=1e3a5f"/>
-
-<img height="180em" src="https://github-readme-stats.vercel.app/api/top-langs/?username=nuvaaf2&layout=compact&theme=tokyonight&hide_border=true&bg_color=020818&title_color=38bdf8&text_color=64748b"/>
+<img height="180em" src="https://github-readme-stats.vercel.app/api?username=nuvaaf2&show_icons=true&theme=tokyonight&include_all_commits=true&count_private=true&hide_border=true&bg_color=0d1117&title_color=58a6ff&icon_color=58a6ff&text_color=8b949e"/>
+<img height="180em" src="https://github-readme-stats.vercel.app/api/top-langs/?username=nuvaaf2&layout=compact&theme=tokyonight&hide_border=true&bg_color=0d1117&title_color=58a6ff&text_color=8b949e"/>
 
 </div>
 
 <div align="center">
 
-[![GitHub Streak](https://nirzak-streak-stats.vercel.app?user=nuvaaf2&theme=tokyonight&hide_border=true&background=020818&ring=38bdf8&fire=38bdf8&currStreakLabel=38bdf8&sideLabels=64748b&dates=64748b&sideNums=38bdf8&currStreakNum=38bdf8)](https://github.com/nuvaaf2)
+[![GitHub Streak](https://nirzak-streak-stats.vercel.app?user=nuvaaf2&theme=tokyonight&hide_border=true&background=0d1117&ring=58a6ff&fire=58a6ff&currStreakLabel=58a6ff)](https://github.com/nuvaaf2)
 
 </div>
-
----
 
 ## 📡 Contact Protocol
 
