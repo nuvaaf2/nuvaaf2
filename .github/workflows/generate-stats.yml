@@ -25,12 +25,9 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Generate Stats SVGs
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          USERNAME: nuvaaf2
+      - name: Write generator script
         run: |
-          node << 'SCRIPT'
+          cat > generate.js << 'JSEOF'
           const https = require('https');
           const fs = require('fs');
 
@@ -45,7 +42,7 @@ jobs:
                 path: '/graphql',
                 method: 'POST',
                 headers: {
-                  'Authorization': `bearer ${token}`,
+                  'Authorization': 'bearer ' + token,
                   'Content-Type': 'application/json',
                   'User-Agent': 'github-stats-action'
                 }
@@ -62,10 +59,8 @@ jobs:
           }
 
           async function main() {
-            // Fetch user stats
             const result = await graphql(`{
               user(login: "${username}") {
-                name
                 contributionsCollection {
                   totalCommitContributions
                   totalPullRequestContributions
@@ -78,6 +73,11 @@ jobs:
               }
             }`);
 
+            if (result.errors) {
+              console.error('GraphQL errors:', JSON.stringify(result.errors));
+              process.exit(1);
+            }
+
             const user = result.data.user;
             const contrib = user.contributionsCollection;
             const repos = user.repositories.nodes;
@@ -87,7 +87,6 @@ jobs:
             const issues = contrib.totalIssueContributions;
             const followers = user.followers.totalCount;
 
-            // Language count
             const langMap = {};
             repos.forEach(r => {
               if (r.primaryLanguage) {
@@ -95,76 +94,74 @@ jobs:
               }
             });
             const langs = Object.entries(langMap).sort((a,b) => b[1]-a[1]).slice(0, 5);
-            const totalLangRepos = langs.reduce((a,b) => a + b[1], 0);
+            const totalLangRepos = Math.max(langs.reduce((a,b) => a + b[1], 0), 1);
 
-            // ── STATS SVG ──────────────────────────────────────────────────
+            // STATS SVG
             const statsSvg = `<svg width="495" height="195" xmlns="http://www.w3.org/2000/svg">
-              <rect width="495" height="195" rx="10" fill="#020818"/>
-              <text x="25" y="35" fill="#38bdf8" font-size="16" font-weight="bold" font-family="monospace">◈ GitHub Stats — ${username}</text>
-              <line x1="25" y1="45" x2="470" y2="45" stroke="#1e3a5f" stroke-width="1"/>
-              <text x="25" y="75"  fill="#64748b" font-size="13" font-family="monospace">Total Stars</text>
-              <text x="380" y="75" fill="#e2e8f0" font-size="13" font-family="monospace" text-anchor="end">${stars}</text>
-              <text x="25" y="105" fill="#64748b" font-size="13" font-family="monospace">Total Commits (this year)</text>
-              <text x="380" y="105" fill="#e2e8f0" font-size="13" font-family="monospace" text-anchor="end">${commits}</text>
-              <text x="25" y="135" fill="#64748b" font-size="13" font-family="monospace">Pull Requests</text>
-              <text x="380" y="135" fill="#e2e8f0" font-size="13" font-family="monospace" text-anchor="end">${prs}</text>
-              <text x="25" y="165" fill="#64748b" font-size="13" font-family="monospace">Issues Opened</text>
-              <text x="380" y="165" fill="#e2e8f0" font-size="13" font-family="monospace" text-anchor="end">${issues}</text>
-              <text x="430" y="75" fill="#64748b" font-size="11" font-family="monospace">⭐</text>
-              <text x="430" y="105" fill="#64748b" font-size="11" font-family="monospace">💻</text>
-              <text x="430" y="135" fill="#64748b" font-size="11" font-family="monospace">🔀</text>
-              <text x="430" y="165" fill="#64748b" font-size="11" font-family="monospace">🐛</text>
-            </svg>`;
+<rect width="495" height="195" rx="10" fill="#020818"/>
+<text x="25" y="35" fill="#38bdf8" font-size="16" font-weight="bold" font-family="monospace">&#9672; GitHub Stats &mdash; ${username}</text>
+<line x1="25" y1="45" x2="470" y2="45" stroke="#1e3a5f" stroke-width="1"/>
+<text x="25" y="78" fill="#64748b" font-size="13" font-family="monospace">Total Stars</text>
+<text x="460" y="78" fill="#e2e8f0" font-size="13" font-family="monospace" text-anchor="end">${stars}</text>
+<text x="25" y="108" fill="#64748b" font-size="13" font-family="monospace">Total Commits (this year)</text>
+<text x="460" y="108" fill="#e2e8f0" font-size="13" font-family="monospace" text-anchor="end">${commits}</text>
+<text x="25" y="138" fill="#64748b" font-size="13" font-family="monospace">Pull Requests</text>
+<text x="460" y="138" fill="#e2e8f0" font-size="13" font-family="monospace" text-anchor="end">${prs}</text>
+<text x="25" y="168" fill="#64748b" font-size="13" font-family="monospace">Issues Opened</text>
+<text x="460" y="168" fill="#e2e8f0" font-size="13" font-family="monospace" text-anchor="end">${issues}</text>
+</svg>`;
             fs.writeFileSync('stats/stats.svg', statsSvg);
-            console.log('✓ stats.svg written');
+            console.log('stats.svg done');
 
-            // ── LANGS SVG ──────────────────────────────────────────────────
+            // LANGS SVG
             const barColors = ['#38bdf8','#0ea5e9','#0284c7','#0369a1','#075985'];
             let langItems = '';
             let yPos = 70;
             langs.forEach(([lang, count], i) => {
               const pct = Math.round((count / totalLangRepos) * 100);
               const barW = Math.round((count / totalLangRepos) * 300);
-              langItems += `
-              <text x="25" y="${yPos}" fill="#e2e8f0" font-size="12" font-family="monospace">${lang}</text>
-              <text x="340" y="${yPos}" fill="#64748b" font-size="12" font-family="monospace" text-anchor="end">${pct}%</text>
-              <rect x="25" y="${yPos+6}" width="${barW}" height="6" rx="3" fill="${barColors[i]}"/>
-              <rect x="25" y="${yPos+6}" width="300" height="6" rx="3" fill="#1e3a5f"/>
-              <rect x="25" y="${yPos+6}" width="${barW}" height="6" rx="3" fill="${barColors[i]}"/>`;
+              langItems += `<text x="25" y="${yPos}" fill="#e2e8f0" font-size="12" font-family="monospace">${lang}</text>
+<text x="345" y="${yPos}" fill="#64748b" font-size="12" font-family="monospace" text-anchor="end">${pct}%</text>
+<rect x="25" y="${yPos+6}" width="300" height="6" rx="3" fill="#1e3a5f"/>
+<rect x="25" y="${yPos+6}" width="${barW}" height="6" rx="3" fill="${barColors[i]}"/>`;
               yPos += 35;
             });
 
-            const langsSvg = `<svg width="380" height="${yPos + 20}" xmlns="http://www.w3.org/2000/svg">
-              <rect width="380" height="${yPos + 20}" rx="10" fill="#020818"/>
-              <text x="25" y="35" fill="#38bdf8" font-size="16" font-weight="bold" font-family="monospace">◈ Top Languages</text>
-              <line x1="25" y1="45" x2="355" y2="45" stroke="#1e3a5f" stroke-width="1"/>
-              ${langItems}
-            </svg>`;
+            const langsSvg = `<svg width="380" height="${yPos+20}" xmlns="http://www.w3.org/2000/svg">
+<rect width="380" height="${yPos+20}" rx="10" fill="#020818"/>
+<text x="25" y="35" fill="#38bdf8" font-size="16" font-weight="bold" font-family="monospace">&#9672; Top Languages</text>
+<line x1="25" y1="45" x2="355" y2="45" stroke="#1e3a5f" stroke-width="1"/>
+${langItems}
+</svg>`;
             fs.writeFileSync('stats/langs.svg', langsSvg);
-            console.log('✓ langs.svg written');
+            console.log('langs.svg done');
 
-            // ── STREAK SVG ─────────────────────────────────────────────────
+            // STREAK SVG
             const streakSvg = `<svg width="495" height="150" xmlns="http://www.w3.org/2000/svg">
-              <rect width="495" height="150" rx="10" fill="#020818"/>
-              <text x="247" y="35" fill="#38bdf8" font-size="16" font-weight="bold" font-family="monospace" text-anchor="middle">◈ Contribution Streak</text>
-              <line x1="25" y1="45" x2="470" y2="45" stroke="#1e3a5f" stroke-width="1"/>
-              <text x="90" y="95" fill="#38bdf8" font-size="26" font-weight="bold" font-family="monospace" text-anchor="middle">${commits}</text>
-              <text x="90" y="120" fill="#64748b" font-size="11" font-family="monospace" text-anchor="middle">This Year</text>
-              <line x1="165" y1="55" x2="165" y2="135" stroke="#1e3a5f" stroke-width="1"/>
-              <text x="247" y="90" fill="#38bdf8" font-size="20" font-weight="bold" font-family="monospace" text-anchor="middle">🔥 Keep going!</text>
-              <text x="247" y="115" fill="#64748b" font-size="11" font-family="monospace" text-anchor="middle">Streak active</text>
-              <line x1="330" y1="55" x2="330" y2="135" stroke="#1e3a5f" stroke-width="1"/>
-              <text x="410" y="95" fill="#38bdf8" font-size="26" font-weight="bold" font-family="monospace" text-anchor="middle">${followers}</text>
-              <text x="410" y="120" fill="#64748b" font-size="11" font-family="monospace" text-anchor="middle">Followers</text>
-            </svg>`;
+<rect width="495" height="150" rx="10" fill="#020818"/>
+<text x="247" y="35" fill="#38bdf8" font-size="16" font-weight="bold" font-family="monospace" text-anchor="middle">&#9672; Contribution Overview</text>
+<line x1="25" y1="45" x2="470" y2="45" stroke="#1e3a5f" stroke-width="1"/>
+<text x="90" y="95" fill="#38bdf8" font-size="26" font-weight="bold" font-family="monospace" text-anchor="middle">${commits}</text>
+<text x="90" y="120" fill="#64748b" font-size="11" font-family="monospace" text-anchor="middle">Commits / Year</text>
+<line x1="165" y1="55" x2="165" y2="135" stroke="#1e3a5f" stroke-width="1"/>
+<text x="247" y="88" fill="#38bdf8" font-size="22" font-weight="bold" font-family="monospace" text-anchor="middle">${stars}</text>
+<text x="247" y="113" fill="#64748b" font-size="11" font-family="monospace" text-anchor="middle">Total Stars</text>
+<line x1="330" y1="55" x2="330" y2="135" stroke="#1e3a5f" stroke-width="1"/>
+<text x="410" y="95" fill="#38bdf8" font-size="26" font-weight="bold" font-family="monospace" text-anchor="middle">${followers}</text>
+<text x="410" y="120" fill="#64748b" font-size="11" font-family="monospace" text-anchor="middle">Followers</text>
+</svg>`;
             fs.writeFileSync('stats/streak.svg', streakSvg);
-            console.log('✓ streak.svg written');
-
-            console.log(`Stats: stars=${stars}, commits=${commits}, prs=${prs}, issues=${issues}`);
+            console.log('streak.svg done');
           }
 
           main().catch(e => { console.error(e); process.exit(1); });
-          SCRIPT
+          JSEOF
+
+      - name: Run generator
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USERNAME: nuvaaf2
+        run: node generate.js
 
       - name: Commit SVGs to repo
         run: |
