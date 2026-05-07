@@ -1,5 +1,11 @@
-The deployment is currently unavailable
-
-DEPLOYMENT_PAUSED
-
-cle1::7p9t5-1778133391755-3b5ba82ff91d
+<svg width="380" height="125" xmlns="http://www.w3.org/2000/svg">
+    <rect width="380" height="125" rx="10" fill="#020818"/>
+    <text x="25" y="35" fill="#38bdf8" font-size="16" font-weight="bold" font-family="monospace">◈ Top Languages</text>
+    <line x1="25" y1="45" x2="355" y2="45" stroke="#1e3a5f" stroke-width="1"/>
+    
+    <text x="25" y="70" fill="#e2e8f0" font-size="12" font-family="monospace">Python</text>
+    <text x="340" y="70" fill="#64748b" font-size="12" font-family="monospace" text-anchor="end">100%</text>
+    <rect x="25" y="76" width="300" height="6" rx="3" fill="#38bdf8"/>
+    <rect x="25" y="76" width="300" height="6" rx="3" fill="#1e3a5f"/>
+    <rect x="25" y="76" width="300" height="6" rx="3" fill="#38bdf8"/>
+  </svg>
