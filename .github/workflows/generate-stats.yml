@@ -20,23 +20,151 @@ jobs:
       - name: Create stats folder
         run: mkdir -p stats
 
-      - name: Download stats card
-        run: |
-          curl -s "https://github-readme-stats.vercel.app/api?username=nuvaaf2&show_icons=true&theme=tokyonight&include_all_commits=true&count_private=true&hide_border=true&bg_color=020818&title_color=38bdf8&icon_color=38bdf8&text_color=64748b" \
-            -o stats/stats.svg
-          echo "Stats card downloaded"
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-      - name: Download top languages card
+      - name: Generate Stats SVGs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USERNAME: nuvaaf2
         run: |
-          curl -s "https://github-readme-stats.vercel.app/api/top-langs/?username=nuvaaf2&layout=compact&theme=tokyonight&hide_border=true&bg_color=020818&title_color=38bdf8&text_color=64748b" \
-            -o stats/langs.svg
-          echo "Languages card downloaded"
+          node << 'SCRIPT'
+          const https = require('https');
+          const fs = require('fs');
 
-      - name: Download streak card
-        run: |
-          curl -s "https://nirzak-streak-stats.vercel.app?user=nuvaaf2&theme=tokyonight&hide_border=true&background=020818&ring=38bdf8&fire=38bdf8&currStreakLabel=38bdf8&sideLabels=64748b&dates=64748b&sideNums=38bdf8&currStreakNum=38bdf8" \
-            -o stats/streak.svg
-          echo "Streak card downloaded"
+          const token = process.env.GITHUB_TOKEN;
+          const username = process.env.USERNAME;
+
+          function graphql(query) {
+            return new Promise((resolve, reject) => {
+              const data = JSON.stringify({ query });
+              const options = {
+                hostname: 'api.github.com',
+                path: '/graphql',
+                method: 'POST',
+                headers: {
+                  'Authorization': `bearer ${token}`,
+                  'Content-Type': 'application/json',
+                  'User-Agent': 'github-stats-action'
+                }
+              };
+              const req = https.request(options, res => {
+                let body = '';
+                res.on('data', d => body += d);
+                res.on('end', () => resolve(JSON.parse(body)));
+              });
+              req.on('error', reject);
+              req.write(data);
+              req.end();
+            });
+          }
+
+          async function main() {
+            // Fetch user stats
+            const result = await graphql(`{
+              user(login: "${username}") {
+                name
+                contributionsCollection {
+                  totalCommitContributions
+                  totalPullRequestContributions
+                  totalIssueContributions
+                }
+                repositories(first: 100, ownerAffiliations: OWNER, isFork: false) {
+                  nodes { stargazerCount primaryLanguage { name } }
+                }
+                followers { totalCount }
+              }
+            }`);
+
+            const user = result.data.user;
+            const contrib = user.contributionsCollection;
+            const repos = user.repositories.nodes;
+            const stars = repos.reduce((acc, r) => acc + r.stargazerCount, 0);
+            const commits = contrib.totalCommitContributions;
+            const prs = contrib.totalPullRequestContributions;
+            const issues = contrib.totalIssueContributions;
+            const followers = user.followers.totalCount;
+
+            // Language count
+            const langMap = {};
+            repos.forEach(r => {
+              if (r.primaryLanguage) {
+                langMap[r.primaryLanguage.name] = (langMap[r.primaryLanguage.name] || 0) + 1;
+              }
+            });
+            const langs = Object.entries(langMap).sort((a,b) => b[1]-a[1]).slice(0, 5);
+            const totalLangRepos = langs.reduce((a,b) => a + b[1], 0);
+
+            // ── STATS SVG ──────────────────────────────────────────────────
+            const statsSvg = `<svg width="495" height="195" xmlns="http://www.w3.org/2000/svg">
+              <rect width="495" height="195" rx="10" fill="#020818"/>
+              <text x="25" y="35" fill="#38bdf8" font-size="16" font-weight="bold" font-family="monospace">◈ GitHub Stats — ${username}</text>
+              <line x1="25" y1="45" x2="470" y2="45" stroke="#1e3a5f" stroke-width="1"/>
+              <text x="25" y="75"  fill="#64748b" font-size="13" font-family="monospace">Total Stars</text>
+              <text x="380" y="75" fill="#e2e8f0" font-size="13" font-family="monospace" text-anchor="end">${stars}</text>
+              <text x="25" y="105" fill="#64748b" font-size="13" font-family="monospace">Total Commits (this year)</text>
+              <text x="380" y="105" fill="#e2e8f0" font-size="13" font-family="monospace" text-anchor="end">${commits}</text>
+              <text x="25" y="135" fill="#64748b" font-size="13" font-family="monospace">Pull Requests</text>
+              <text x="380" y="135" fill="#e2e8f0" font-size="13" font-family="monospace" text-anchor="end">${prs}</text>
+              <text x="25" y="165" fill="#64748b" font-size="13" font-family="monospace">Issues Opened</text>
+              <text x="380" y="165" fill="#e2e8f0" font-size="13" font-family="monospace" text-anchor="end">${issues}</text>
+              <text x="430" y="75" fill="#64748b" font-size="11" font-family="monospace">⭐</text>
+              <text x="430" y="105" fill="#64748b" font-size="11" font-family="monospace">💻</text>
+              <text x="430" y="135" fill="#64748b" font-size="11" font-family="monospace">🔀</text>
+              <text x="430" y="165" fill="#64748b" font-size="11" font-family="monospace">🐛</text>
+            </svg>`;
+            fs.writeFileSync('stats/stats.svg', statsSvg);
+            console.log('✓ stats.svg written');
+
+            // ── LANGS SVG ──────────────────────────────────────────────────
+            const barColors = ['#38bdf8','#0ea5e9','#0284c7','#0369a1','#075985'];
+            let langItems = '';
+            let yPos = 70;
+            langs.forEach(([lang, count], i) => {
+              const pct = Math.round((count / totalLangRepos) * 100);
+              const barW = Math.round((count / totalLangRepos) * 300);
+              langItems += `
+              <text x="25" y="${yPos}" fill="#e2e8f0" font-size="12" font-family="monospace">${lang}</text>
+              <text x="340" y="${yPos}" fill="#64748b" font-size="12" font-family="monospace" text-anchor="end">${pct}%</text>
+              <rect x="25" y="${yPos+6}" width="${barW}" height="6" rx="3" fill="${barColors[i]}"/>
+              <rect x="25" y="${yPos+6}" width="300" height="6" rx="3" fill="#1e3a5f"/>
+              <rect x="25" y="${yPos+6}" width="${barW}" height="6" rx="3" fill="${barColors[i]}"/>`;
+              yPos += 35;
+            });
+
+            const langsSvg = `<svg width="380" height="${yPos + 20}" xmlns="http://www.w3.org/2000/svg">
+              <rect width="380" height="${yPos + 20}" rx="10" fill="#020818"/>
+              <text x="25" y="35" fill="#38bdf8" font-size="16" font-weight="bold" font-family="monospace">◈ Top Languages</text>
+              <line x1="25" y1="45" x2="355" y2="45" stroke="#1e3a5f" stroke-width="1"/>
+              ${langItems}
+            </svg>`;
+            fs.writeFileSync('stats/langs.svg', langsSvg);
+            console.log('✓ langs.svg written');
+
+            // ── STREAK SVG ─────────────────────────────────────────────────
+            const streakSvg = `<svg width="495" height="150" xmlns="http://www.w3.org/2000/svg">
+              <rect width="495" height="150" rx="10" fill="#020818"/>
+              <text x="247" y="35" fill="#38bdf8" font-size="16" font-weight="bold" font-family="monospace" text-anchor="middle">◈ Contribution Streak</text>
+              <line x1="25" y1="45" x2="470" y2="45" stroke="#1e3a5f" stroke-width="1"/>
+              <text x="90" y="95" fill="#38bdf8" font-size="26" font-weight="bold" font-family="monospace" text-anchor="middle">${commits}</text>
+              <text x="90" y="120" fill="#64748b" font-size="11" font-family="monospace" text-anchor="middle">This Year</text>
+              <line x1="165" y1="55" x2="165" y2="135" stroke="#1e3a5f" stroke-width="1"/>
+              <text x="247" y="90" fill="#38bdf8" font-size="20" font-weight="bold" font-family="monospace" text-anchor="middle">🔥 Keep going!</text>
+              <text x="247" y="115" fill="#64748b" font-size="11" font-family="monospace" text-anchor="middle">Streak active</text>
+              <line x1="330" y1="55" x2="330" y2="135" stroke="#1e3a5f" stroke-width="1"/>
+              <text x="410" y="95" fill="#38bdf8" font-size="26" font-weight="bold" font-family="monospace" text-anchor="middle">${followers}</text>
+              <text x="410" y="120" fill="#64748b" font-size="11" font-family="monospace" text-anchor="middle">Followers</text>
+            </svg>`;
+            fs.writeFileSync('stats/streak.svg', streakSvg);
+            console.log('✓ streak.svg written');
+
+            console.log(`Stats: stars=${stars}, commits=${commits}, prs=${prs}, issues=${issues}`);
+          }
+
+          main().catch(e => { console.error(e); process.exit(1); });
+          SCRIPT
 
       - name: Commit SVGs to repo
         run: |
