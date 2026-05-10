@@ -148,11 +148,11 @@
 
 ---
 
-## `[STA]` ◈ SYSTEM METRICS
+## `[STATS]` ◈ SYSTEM METRICS
 
 <div align="center">
 
-<img height="180em" src="./stats/stats.svg"/>
+<img height="160em" src="./stats/stats.svg"/>
 <img height="180em" src="./stats/langs.svg"/>
 
 </div>
