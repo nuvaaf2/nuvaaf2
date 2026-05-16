@@ -54,6 +54,8 @@
 |:---:|:---:|:---:|
 | ⚙️ Automation Core | n8n (self-hosted & cloud) | `■ ACTIVE` |
 | 🧠 AI / LLM Layer | OpenAI GPT-4.1 · GPT-4.1-mini | `■ ACTIVE` |
+| 🤖 Machine Learning | Scikit-learn · ML Pipelines | `■ ACTIVE` |
+| 🔬 Deep Learning | Neural Networks · Model Training | `■ ACTIVE` |
 | ☁️ Cloud Platform | Microsoft Azure AI | `■ ACTIVE` |
 | 📡 Comms API | Telegram Bot · Gmail · SMTP/IMAP | `■ ACTIVE` |
 | 📂 Storage Layer | Google Drive API · Google Docs | `■ ACTIVE` |
@@ -118,6 +120,8 @@
   <img src="https://img.shields.io/badge/n8n-%23EA4B71.svg?style=for-the-badge&logo=n8n&logoColor=white" />
   <img src="https://img.shields.io/badge/OpenAI-%23412991.svg?style=for-the-badge&logo=openai&logoColor=white" />
   <img src="https://img.shields.io/badge/Azure-%230078D4.svg?style=for-the-badge&logo=microsoftazure&logoColor=white" />
+  <img src="https://img.shields.io/badge/Machine%20Learning-%23FF6F00.svg?style=for-the-badge&logo=scikitlearn&logoColor=white" />
+  <img src="https://img.shields.io/badge/Deep%20Learning-%23FF0000.svg?style=for-the-badge&logo=tensorflow&logoColor=white" />
   <img src="https://img.shields.io/badge/Python-%230d6efd.svg?style=for-the-badge&logo=python&logoColor=white" />
   <img src="https://img.shields.io/badge/Node.js-%23339933.svg?style=for-the-badge&logo=nodedotjs&logoColor=white" />
   <img src="https://img.shields.io/badge/Telegram-%2326A5E4.svg?style=for-the-badge&logo=telegram&logoColor=white" />
@@ -139,6 +143,9 @@
 │                                                                            │
 │   ◈  Advanced IT Skills — Azure AI .............. [ IBM SkillsBuild ]    │
 │   ◈  Introduction to Artificial Intelligence ................ [ IBM ]    │
+│   ◈  Artificial Intelligence Fundamentals ................... [ IBM ]    │
+│   ◈  AI Applications for Customer Services .................. [ IBM ]    │
+│   ◈  Python Essentials 1 ............................ [ Cisco NetAcad ]  │
 │   ◈  Web Development ................................ [ IBM CSRBOX ]    │
 │                                                                            │
 └──────────────────────────────────────────────────────────────────────────┘
@@ -152,14 +159,14 @@
 
 <div align="center">
 
-<img height="160em" src="./stats/stats.svg"/>
-<img height="180em" src="./stats/langs.svg"/>
+<img height="160em" src="https://github-readme-stats.vercel.app/api?username=nuvaaf2&show_icons=true&theme=tokyonight&hide_border=true&bg_color=000d1a&title_color=00d4ff&icon_color=00d4ff&text_color=4a9eba&count_private=true" />
+<img height="160em" src="https://github-readme-stats.vercel.app/api/top-langs/?username=nuvaaf2&layout=compact&theme=tokyonight&hide_border=true&bg_color=000d1a&title_color=00d4ff&text_color=4a9eba" />
 
 </div>
 
 <div align="center">
 
-<img src="./stats/streak.svg"/>
+<img src="https://streak-stats.demolab.com?user=nuvaaf2&theme=tokyonight&hide_border=true&background=000d1a&stroke=00d4ff&ring=00d4ff&fire=4a9eba&currStreakLabel=00d4ff&sideLabels=4a9eba&dates=4a9eba" />
 
 </div>
 
