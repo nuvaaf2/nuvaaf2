@@ -159,20 +159,44 @@
 
 <div align="center">
 
-<img height="160em" src="https://github-readme-stats.vercel.app/api?username=nuvaaf2&show_icons=true&theme=tokyonight&hide_border=true&bg_color=000d1a&title_color=00d4ff&icon_color=00d4ff&text_color=4a9eba&count_private=true" />
-<img height="160em" src="https://github-readme-stats.vercel.app/api/top-langs/?username=nuvaaf2&layout=compact&theme=tokyonight&hide_border=true&bg_color=000d1a&title_color=00d4ff&text_color=4a9eba" />
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                                                                            │
+│   root@nuvaaf2:~$ whoami --skill-level                                   │
+│                                                                            │
+│   ◈ AUTOMATION DESIGN     ████████████████████░░  90%                   │
+│   ◈ LLM / PROMPT ENGINEERING  ██████████████████░░  88%                 │
+│   ◈ PYTHON                ███████████████████░░░  85%                   │
+│   ◈ N8N WORKFLOW BUILDING ████████████████████░░  92%                   │
+│   ◈ CLOUD / AZURE AI      ██████████████░░░░░░░░  68%                   │
+│   ◈ API INTEGRATION       ███████████████████░░░  86%                   │
+│                                                                            │
+└──────────────────────────────────────────────────────────────────────────┘
+```
 
 </div>
 
+<br/>
+
 <div align="center">
 
-<img src="https://streak-stats.demolab.com?user=nuvaaf2&theme=tokyonight&hide_border=true&background=000d1a&stroke=00d4ff&ring=00d4ff&fire=4a9eba&currStreakLabel=00d4ff&sideLabels=4a9eba&dates=4a9eba" />
+| `METRIC` | `VALUE` |
+|:---:|:---:|
+| 🧩 Core Focus | AI Automation · n8n · LLM Pipelines |
+| 🚀 Deployed Systems | 3 production-grade pipelines |
+| 🎓 Certifications | 6 (IBM · Cisco NetAcad) |
+| 📡 Status | Open to Internship / Collaboration |
+| 🛰️ Primary Language | Python |
 
 </div>
 
+<br/>
+
 <div align="center">
 
-[![trophy](https://github-profile-trophy.vercel.app/?username=nuvaaf2&theme=tokyonight&no-frame=true&row=1&column=6&margin-w=8)](https://github.com/nuvaaf2)
+[![Profile Views](https://img.shields.io/badge/◈_PROFILE-ONLINE-00d4ff?style=for-the-badge&logoColor=white)]()
+[![Focus](https://img.shields.io/badge/◈_FOCUS-AI_AUTOMATION-4a9eba?style=for-the-badge&logoColor=white)]()
+[![Build](https://img.shields.io/badge/◈_BUILD-PASSING-00d4ff?style=for-the-badge&logoColor=white)]()
 
 </div>
 
